@@ -2,6 +2,14 @@
 
 List2CSV is a simple package that helps with writing lists of objects to CSV files.
 
+## Installation
+
+list2csv can be downloaded from [pypi](https://pypi.org/project/list2csv/) or installed using pip:
+
+    pip install list2csv
+
+## Overview
+
 The main class `Writer` takes a writable file as a parameter and can have various fields added with format specifiers.
 Fields can either be instance attribute names or functions that map an object to some value.
 For example:
