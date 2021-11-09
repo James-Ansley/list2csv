@@ -5,7 +5,7 @@ with open('README.md', 'r', encoding='utf-8') as fh:
 
 setuptools.setup(
     name='list2csv',
-    version='1.1.0.dev1',
+    version='1.2.0',
     author='James Finnie-Ansley',
     description='A simple package intended to help write iterables '
                 'of objects to CSV files',
@@ -13,11 +13,10 @@ setuptools.setup(
     long_description_content_type='text/markdown',
     url='https://github.com/James-Ansley/list2csv',
     classifiers=[
-        'Development Status :: 1 - Planning',
+        'Development Status :: 5 - Production/Stable',
         'Topic :: Utilities',
         'Intended Audience :: Developers',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
         'License :: OSI Approved :: MIT License',

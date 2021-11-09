@@ -10,8 +10,8 @@ list2csv can be downloaded from [pypi](https://pypi.org/project/list2csv/) or in
 
 ## Overview
 
-The main class `Writer` takes a writable file as a parameter and can have various fields added with format specifiers.
-Fields can either be instance attribute names or functions that map an object to some value. For example:
+The main class `Writer` takes a writable file as a parameter and can have various columns added with format specifiers.
+Columns can either be defined by instance attribute names or functions that map an object to some value. For example:
 
 ```python
 from dataclasses import dataclass
@@ -35,9 +35,9 @@ students = [
 
 with open('student_overview.csv', 'w') as f:
     writer = list2csv.Writer(f)
-    writer.add_field('ID', 'student_id')
-    writer.add_field('Test Mark', 'test_mark', '{:.2f}')
-    writer.add_field('Average Lab Mark', lambda s: mean(s.lab_marks), '{:.2f}')
+    writer.add_column('ID', 'student_id')
+    writer.add_column('Test Mark', 'test_mark', '{:.2f}')
+    writer.add_column('Average Lab Mark', lambda s: mean(s.lab_marks), '{:.2f}')
 
     writer.write_header()
     writer.write_all(students)
@@ -53,28 +53,28 @@ Would produce the following table:
 
 ## Fields
 
-Fields, added by `.add_field` or `.add_multi_field`, take a function that maps an object to a value **or** a string that
-matches the name of an attribute of Type `T`.
+Columns, added by `.add_column` or `.add_multi_column`, take a function that maps an object to a value **or** a string
+that matches the name of an attribute of Type `T`.
 
-In the above example, the `add_field` method is used to add the `student_id` and `test_mark` fields; both of which are
+In the above example, the `add_column` method is used to add the `student_id` and `test_mark` fields; both of which are
 attribute names of `Student`. But the add field method is also used to add the `Average Lab Mark` field, which is _
 computed_ using a lambda that maps a `Student` instance to a `float` representing the average lab mark for that student.
 
-In the case of multi-fields, either a string representing an attribute name or a function that maps an object to an
+In the case of multi-columns, either a string representing an attribute name or a function that maps an object to an
 iterable of values can be used.
 
 ### Writing Iterables
 
-It may be desirable to quickly add iterables as a set of columns to the table. For this, the `.add_multi_field` method
-can be used. This field expects iterables of a pre-defined length and will write them as individual columns. For
-example, if we wanted to put the lab marks of each student in separate columns, we could do:
+It may be desirable to quickly add iterables as a set of columns to the table. For this, the `.add_multi_column` method
+can be used. This column expects iterables of a pre-defined length as specified by a `range` and will write them as
+individual columns. For example, if we wanted to put the lab marks of each student in separate columns, we could do:
 
 ```python
 with open('student_overview.csv', 'w') as f:
     writer = list2csv.Writer(f)
-    writer.add_field('ID', 'student_id')
-    writer.add_field('Test Mark', 'test_mark', '{:.2f}')
-    writer.add_multi_field('Lab {}', 'lab_marks', 4, '{:.2f}')
+    writer.add_column('ID', 'student_id')
+    writer.add_column('Test Mark', 'test_mark', '{:.2f}')
+    writer.add_multi_column('Lab {}', 'lab_marks', range(1, 5), '{:.2f}')
 
     writer.write_header()
     writer.write_all(students)
@@ -96,16 +96,17 @@ a `ValueError` will be raised.
 
 ### Aggregator Columns
 
-Fields have an `aggregate` parameter that indicates the field will be used in an aggregate column. These aggregate
+Columns have an `aggregate` parameter that indicates the field will be used in an aggregate column. These aggregate
 columns can be added using the `.add_aggregator` method. For example, if we wanted to add the average lab mark to the
 table, we could do:
 
 ```python
 with open('student_overview.csv', 'w') as f:
     writer = list2csv.Writer(f)
-    writer.add_field('ID', 'student_id')
-    writer.add_field('Test Mark', 'test_mark', '{:.2f}')
-    writer.add_multi_field('Lab {}', 'lab_marks', 4, '{:.2f}', aggregate=True)
+    writer.add_column('ID', 'student_id')
+    writer.add_column('Test Mark', 'test_mark', '{:.2f}')
+    writer.add_multi_column('Lab {}', 'lab_marks',
+                            range(1, 5), '{:.2f}', aggregate=True)
     writer.add_aggregator('Average Lab Mark', mean, '{:.2f}')
 
     writer.write_header()
@@ -124,6 +125,9 @@ In this case, the use of the `.add_aggregator` method is trivial; however, it ca
 it useful in some instances. For example, if the 'TestMark' field was also flagged as an aggregate field, this would be
 included in the average calculation for the 'Average Lab Mark' field.
 
+The range parameter indicates the indices that will be used in the column headers, as well as how many columns will be
+expected.
+
 ### Counters
 
 To add auto incrementing values to the table, the `.add_counter` method can be used. This will increment values with a
@@ -133,9 +137,9 @@ given start and step value for each row written. For example:
 with open('student_overview.csv', 'w') as f:
     writer = list2csv.Writer(f)
     writer.add_counter('Student', start=1)
-    writer.add_field('ID', 'student_id')
-    writer.add_field('Test Mark', 'test_mark', '{:.2f}')
-    writer.add_field('Average Lab Mark', lambda s: mean(s.lab_marks), '{:.2f}')
+    writer.add_column('ID', 'student_id')
+    writer.add_column('Test Mark', 'test_mark', '{:.2f}')
+    writer.add_column('Average Lab Mark', lambda s: mean(s.lab_marks), '{:.2f}')
 
     writer.write_header()
     writer.write_all(students)
@@ -168,27 +172,24 @@ class Student:
     student_id: str
     test_1_mark: float
     test_2_mark: float
-    assign_marks: list[float]
+    assignment_marks: list[float]
     lab_marks: list[float]
     comments: list[str]
 
 
 students = [
     Student('abcd123',
-            78.5,
-            88,
+            78.5, 88,
             [84.5, 96, 87],
             [92.3, 98, 100, 70],
             ['Good', 'Needs work on classes']),
     Student('efgh456',
-            62,
-            74,
+            62, 74,
             [70.5, 76, 80],
             [98, 68.2, 0, 93.5],
             ['Good', 'Needs work on formatting', 'Needs work on recursion']),
     Student('ijkl789',
-            100,
-            99.5,
+            100, 99.5,
             [98.5, 100, 100],
             [100, 100, 98.7, 100],
             ['Excellent']),
@@ -197,15 +198,17 @@ students = [
 with open('student_overview.csv', 'w') as f:
     writer = list2csv.Writer(f)
     writer.add_counter('Student', start=1)
-    writer.add_field('ID', 'student_id')
-    writer.add_field('Test 1', 'test_1_mark', '{:.2f}', aggregate=True)
-    writer.add_field('Test 2', 'test_2_mark', '{:.2f}', aggregate=True)
+    writer.add_column('ID', 'student_id')
+    writer.add_column('Test 1', 'test_1_mark', '{:.2f}', aggregate=True)
+    writer.add_column('Test 2', 'test_2_mark', '{:.2f}', aggregate=True)
     writer.add_aggregator('Av. Test Mark', mean, '{:.2f}')
-    writer.add_multi_field('A{}', 'assign_marks', 3, '{:.2f}', aggregate=True)
+    writer.add_multi_column('A{}', 'assignment_marks',
+                            range(1, 4), '{:.2f}', aggregate=True)
     writer.add_aggregator('Av. Assignment Mark', mean, '{:.2f}')
-    writer.add_multi_field('Lab {}', 'lab_marks', 4, '{:.2f}', aggregate=True)
+    writer.add_multi_column('Lab {}', 'lab_marks',
+                            range(1, 5), '{:.2f}', aggregate=True)
     writer.add_aggregator('Av. Lab Mark', mean, '{:.2f}')
-    writer.add_field('Comments', lambda s: '\n'.join(s.comments))
+    writer.add_column('Comments', lambda s: '\n'.join(s.comments))
 
     writer.write_header()
     writer.write_all(students)
