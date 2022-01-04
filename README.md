@@ -82,9 +82,8 @@ with open('grades.csv') as f:
 
 Which will produce the following table:
 
-|C1     |
-|-------|
 |ID     |
+|-------|
 |abcd123|
 |efgh456|
 |ijkl789|
@@ -258,8 +257,8 @@ with open('grades.csv', 'w') as f:
     writer.write_all(students)
 ```
 
-|Student Num|ID     |Test 1|Test 2|Av Test Mark|Assignment 1|Assignment 2|Assignment 3|Av Assignment Mark|Lab 1 |Lab 2 |Lab 3 |Lab 4 |Av. Lab Mark|Grade  |Comments                                             |
-|-----------|-------|------|------|------------|------------|------------|------------|------------------|------|------|------|------|------------|-------|-----------------------------------------------------|
-|1          |abcd123|78.50 |88.00 |83.25       |84.50       |96.00       |87.00       |89.17             |92.30 |98.00 |100.00|70.00 |90.08       |8570.75|Good<br>Needs work on classes                           |
+|Student Num|ID     |Test 1|Test 2|Av Test Mark|Assignment 1|Assignment 2|Assignment 3|Av Assignment Mark|Lab 1 |Lab 2 |Lab 3 |Lab 4 |Av. Lab Mark|Grade  |Comments                                                   |
+|-----------|-------|------|------|------------|------------|------------|------------|------------------|------|------|------|------|------------|-------|-----------------------------------------------------------|
+|1          |abcd123|78.50 |88.00 |83.25       |84.50       |96.00       |87.00       |89.17             |92.30 |98.00 |100.00|70.00 |90.08       |8570.75|Good<br>Needs work on classes                              |
 |2          |efgh456|62.00 |74.00 |68.00       |70.50       |76.00       |80.00       |75.50             |98.00 |68.20 |0.00  |93.50 |64.92       |6994.25|Good<br>Needs work on formatting<br>Needs work on recursion|
-|3          |ijkl789|100.00|99.50 |99.75       |98.50       |100.00      |100.00      |99.50             |100.00|100.00|98.70 |100.00|99.67       |9966.75|Excellent                                            |
+|3          |ijkl789|100.00|99.50 |99.75       |98.50       |100.00      |100.00      |99.50             |100.00|100.00|98.70 |100.00|99.67       |9966.75|Excellent                                                  |

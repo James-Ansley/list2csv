@@ -1,21 +1,21 @@
 import abc as _abc
 import csv as _csv
 from collections import defaultdict as _defaultdict
-from operator import attrgetter
-from typing import Generic, TypeVar, TextIO, Callable, Iterable, Any, Union
+from operator import attrgetter as _attrgetter
+import typing as _typing
 
 __all__ = ['Writer']
 
-T = TypeVar('T')
-V = TypeVar('V')
+T = _typing.TypeVar('T')
+V = _typing.TypeVar('V')
 
-_eval_func = Union[Callable[[T], Any], str]
-_multi_eval_func = Union[Callable[[T], Iterable], str]
-_aggregate_func = Callable[[Iterable[T]], Any]
+_eval_func = _typing.Union[_typing.Callable[[T], _typing.Any], str]
+_multi_eval_func = _typing.Union[_typing.Callable[[T], _typing.Iterable], str]
+_aggregate_func = _typing.Callable[[_typing.Iterable[T]], _typing.Any]
 
 
-class Writer(Generic[T]):
-    def __init__(self, f: TextIO):
+class Writer(_typing.Generic[T]):
+    def __init__(self, f: _typing.TextIO):
         self._writer = _csv.writer(f)
         self._fields = []
         self._to_aggregate = _defaultdict(list)
@@ -89,7 +89,7 @@ class Writer(Generic[T]):
                   aggregate_ids: set = frozenset()):
         """
         Adds several columns, each corresponding to a single value taken from
-        an iterable of length ``num_items``.
+        an Iterable of length ``num_items``.
 
         Each resulting column will be named ``header_template.format(i)``,
         where ``i`` is the one-based index of the column.
@@ -131,7 +131,7 @@ class Writer(Generic[T]):
         self._writer.writerow(row)
         self._row_count += 1
 
-    def write_all(self, items: Iterable[T]):
+    def write_all(self, items: _typing.Iterable[T]):
         """
         Writes all the rows of data. This is equivalent to making repeated
         calls to ``write_row`` with each item .
@@ -144,7 +144,7 @@ class Writer(Generic[T]):
             self._to_aggregate[id_].append(field)
 
 
-class _Field(_abc.ABC, Generic[T, V]):
+class _Field(_abc.ABC, _typing.Generic[T, V]):
     def __init__(self, header, data_format):
         self.header = header
         self.data_format = data_format
@@ -167,7 +167,7 @@ class _Field(_abc.ABC, Generic[T, V]):
     @staticmethod
     def normalise_evaluator(evaluator):
         if isinstance(evaluator, str):
-            return attrgetter(evaluator)
+            return _attrgetter(evaluator)
         return evaluator
 
 
