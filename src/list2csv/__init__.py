@@ -1,24 +1,22 @@
-import abc as _abc
-import csv as _csv
-from collections import defaultdict as _defaultdict
-from operator import attrgetter as _attrgetter
-import typing as _typing
+import abc
+import csv
+from collections import defaultdict
+from operator import attrgetter
+from typing import TypeVar, Union, Callable, Any, Iterable, Generic, TextIO
 
-__all__ = ['Writer']
+_T = TypeVar('_T')
+_V = TypeVar('_V')
 
-T = _typing.TypeVar('T')
-V = _typing.TypeVar('V')
-
-_eval_func = _typing.Union[_typing.Callable[[T], _typing.Any], str]
-_multi_eval_func = _typing.Union[_typing.Callable[[T], _typing.Iterable], str]
-_aggregate_func = _typing.Callable[[_typing.Iterable[T]], _typing.Any]
+_eval_func = Union[Callable[[_T], Any], str]
+_multi_eval_func = Union[Callable[[_T], Iterable], str]
+_aggregate_func = Callable[[Iterable[_T]], Any]
 
 
-class Writer(_typing.Generic[T]):
-    def __init__(self, f: _typing.TextIO):
-        self._writer = _csv.writer(f)
+class Writer(Generic[_T]):
+    def __init__(self, f: TextIO):
+        self._writer = csv.writer(f)
         self._fields = []
-        self._to_aggregate = _defaultdict(list)
+        self._to_aggregate = defaultdict(list)
         self._row_count = 0
 
     def add_column(self,
@@ -43,7 +41,7 @@ class Writer(_typing.Generic[T]):
         self._add_to_aggregate(field, aggregate_ids)
 
     def add_aggregator(self,
-                       aggregate_id,
+                       aggregate_id: Any,
                        header: str,
                        aggregate_evaluator: _aggregate_func,
                        data_format: str = '{}',
@@ -117,7 +115,7 @@ class Writer(_typing.Generic[T]):
         headers = (f.header for f in self._fields)
         self._writer.writerow(headers)
 
-    def write_row(self, item: T):
+    def write_row(self, item: _T):
         """
         Writes a row of data.
 
@@ -131,7 +129,7 @@ class Writer(_typing.Generic[T]):
         self._writer.writerow(row)
         self._row_count += 1
 
-    def write_all(self, items: _typing.Iterable[T]):
+    def write_all(self, items: Iterable[_T]):
         """
         Writes all the rows of data. This is equivalent to making repeated
         calls to ``write_row`` with each item .
@@ -144,30 +142,30 @@ class Writer(_typing.Generic[T]):
             self._to_aggregate[id_].append(field)
 
 
-class _Field(_abc.ABC, _typing.Generic[T, V]):
+class _Field(abc.ABC, Generic[_T, _V]):
     def __init__(self, header, data_format):
         self.header = header
         self.data_format = data_format
         self.last_row = -1
         self.last_value = None
 
-    def eval(self, item: T, row_number: int) -> V:
+    def eval(self, item: _T, row_number: int) -> _V:
         if row_number != self.last_row:
             self.last_row = row_number
             self.last_value = self._eval(item, row_number)
         return self.last_value
 
-    def format(self, value: V) -> str:
+    def format(self, value: _V) -> str:
         return self.data_format.format(value)
 
-    @_abc.abstractmethod
-    def _eval(self, item: T, row_number: int) -> V:
+    @abc.abstractmethod
+    def _eval(self, item: _T, row_number: int) -> _V:
         ...
 
     @staticmethod
     def normalise_evaluator(evaluator):
         if isinstance(evaluator, str):
-            return _attrgetter(evaluator)
+            return attrgetter(evaluator)
         return evaluator
 
 
@@ -176,7 +174,7 @@ class _Simple(_Field):
         super().__init__(header, data_format)
         self.evaluator = _Field.normalise_evaluator(evaluator)
 
-    def _eval(self, item: T, row_number: int):
+    def _eval(self, item: _T, row_number: int):
         return self.evaluator(item)
 
 
@@ -186,7 +184,7 @@ class _Aggregator(_Field):
         self.evaluator = _Field.normalise_evaluator(evaluator)
         self.to_aggregate = to_aggregate
 
-    def _eval(self, item: T, row_number: int) -> V:
+    def _eval(self, item: _T, row_number: int) -> _V:
         values = (field.eval(item, row_number) for field in self.to_aggregate)
         return self.evaluator(values)
 
@@ -197,7 +195,7 @@ class _Counter(_Field):
         self.start = start
         self.step = step
 
-    def _eval(self, item: T, row_number: int) -> V:
+    def _eval(self, item: _T, row_number: int) -> _V:
         return self.start + row_number * self.step
 
 
@@ -207,6 +205,6 @@ class _Multi(_Field):
         self.seq_field = seq_field
         self.idx = idx
 
-    def _eval(self, item: T, row_number: int) -> V:
+    def _eval(self, item: _T, row_number: int) -> _V:
         seq = self.seq_field.eval(item, row_number)
         return seq[self.idx]
