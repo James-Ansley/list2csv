@@ -5,7 +5,7 @@ with open('README.md', 'r', encoding='utf-8') as fh:
 
 setuptools.setup(
     name='list2csv',
-    version='1.3.4',
+    version='1.3.5',
     author='James Finnie-Ansley',
     description='A simple package intended to help write iterables '
                 'of objects to CSV files',
