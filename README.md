@@ -72,7 +72,7 @@ should be formatted as it is written to the CSV file.
 ```python
 import list2csv
 
-with open('grades.csv') as f:
+with open('grades.csv', 'w', newline='') as f:
     writer = list2csv.Writer(f)
     writer.add_column('ID', lambda s: s.student_id)
 
@@ -94,7 +94,7 @@ string of the attribute name of the objects being written:
 ```python
 import list2csv
 
-with open('grades.csv') as f:
+with open('grades.csv', 'w', newline='') as f:
     writer = list2csv.Writer(f)
     writer.add_column('ID', 'student_id')
 
@@ -109,7 +109,7 @@ Several columns can be added with subsequent calls to `add_column`.
 ```python
 import list2csv
 
-with open('grades.csv', 'w') as f:
+with open('grades.csv', 'w', newline='') as f:
     writer = list2csv.Writer(f)
     writer.add_column('ID', 'student_id')
     writer.add_column('Test 1', 'test_1_mark', '{:.2f}')
@@ -134,7 +134,7 @@ written to the CSV. Counter columns have a default start value of 1 and a
 default step value of 1.
 
 ```python
-with open('grades.csv', 'w') as f:
+with open('grades.csv', 'w', newline='') as f:
     writer = list2csv.Writer(f)
     writer.add_counter('Student Num')
     writer.add_column('ID', 'student_id')
@@ -169,7 +169,7 @@ Multi columns will also need to be defined with the number of columns that will
 be added.
 
 ```python
-with open('grades.csv', 'w') as f:
+with open('grades.csv', 'w', newline='') as f:
     writer = list2csv.Writer(f)
     writer.add_counter('Student Num')
     writer.add_column('ID', 'student_id')
@@ -197,7 +197,7 @@ columns are added with an ID, all columns with a matching ID will be aggregated
 into a single column using an aggregator function. For example:
 
 ```python
-with open('grades.csv', 'w') as f:
+with open('grades.csv', 'w', newline='') as f:
     writer = list2csv.Writer(f)
     writer.add_counter('Student Num')
     writer.add_column('ID', 'student_id')
@@ -237,7 +237,7 @@ to add a single column with an aggregating function. For example:
 ### Extended Example
 
 ```python
-with open('grades.csv', 'w') as f:
+with open('grades.csv', 'w', newline='') as f:
     writer = list2csv.Writer(f)
     writer.add_counter('Student Num')
     writer.add_column('ID', 'student_id')
@@ -262,3 +262,8 @@ with open('grades.csv', 'w') as f:
 |1          |abcd123|78.50 |88.00 |83.25       |84.50       |96.00       |87.00       |89.17             |92.30 |98.00 |100.00|70.00 |90.08       |85.71|Good<br>Needs work on classes                              |
 |2          |efgh456|62.00 |74.00 |68.00       |70.50       |76.00       |80.00       |75.50             |98.00 |68.20 |0.00  |93.50 |64.92       |69.94|Good<br>Needs work on formatting<br>Needs work on recursion|
 |3          |ijkl789|100.00|99.50 |99.75       |98.50       |100.00      |100.00      |99.50             |100.00|100.00|98.70 |100.00|99.67       |99.67|Excellent                                                  |
+
+
+## Note
+
+Files should be opened with `newline=''` to allow for universal newline support.
